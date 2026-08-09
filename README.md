@@ -4,10 +4,32 @@ A lightweight Spring Boot application for sending emails using `JavaMailSender` 
 
 ---
 
+## 🌿 Branch Overview
+
+This repository demonstrates two different approaches to configuring email settings in Spring Boot across two branches:
+
+| Branch | Description | Configuration Approach |
+| :--- | :--- | :--- |
+| **`main`** | Simple Spring Mail Configuration | Properties are added in `application.yaml`, leveraging Spring Boot auto-configuration for `JavaMailSender`. |
+| **`Email-Configuration`** | Programmatic Configuration Class | Properties are managed in `ApplicationConstants.java` and explicitly configured via a `@Configuration` class (`EmailConfig.java`). |
+
+### Switch Branches
+```bash
+# Switch to main branch (application.yaml configuration)
+git checkout main
+
+# Switch to Email-Configuration branch (Configuration class & ApplicationConstants)
+git checkout Email-Configuration
+```
+
+---
+
 ## 📋 Table of Contents
 - [Prerequisites](#-prerequisites)
 - [🔑 How to Get a Gmail App Password](#-how-to-get-a-gmail-app-password)
-- [⚙️ Configuration](#️-configuration)
+- [⚙️ Configuration Modes](#️-configuration-modes)
+  - [1. YAML Configuration (`main` branch)](#1-yaml-configuration-main-branch)
+  - [2. Configuration Class (`Email-Configuration` branch)](#2-configuration-class-email-configuration-branch)
 - [🚀 Running the Application](#-running-the-application)
 - [🧪 Testing the Endpoint](#-testing-the-endpoint)
 - [🛡️ Security Best Practices](#️-security-best-practices)
@@ -35,13 +57,15 @@ Google no longer supports "Less Secure Apps" for authentication. You must use an
 2. Enter an **App name** (e.g., `SpringBootEmail`).
 3. Click **Create**.
 4. Google will display a **16-character passcode** (e.g., `abcd efgh ijkl mnop`).
-5. **Copy this passcode** immediately. *(Note: You will use this code as your `spring.mail.password` without spaces).*
+5. **Copy this passcode** immediately. *(Note: You will use this code as your mail password without spaces).*
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ Configuration Modes
 
-The email configuration is located in `src/main/resources/application.yaml`.
+### 1. YAML Configuration (`main` branch)
+
+In the `main` branch, email properties are defined directly in `src/main/resources/application.yaml`. Spring Boot automatically creates and wires the `JavaMailSender` bean based on these properties.
 
 ```yaml
 spring:
@@ -66,29 +90,41 @@ spring:
           writetimeout: 5000
 ```
 
-### 💡 Using Environment Variables (Recommended)
-To keep your sensitive credentials safe and out of version control, configure `application.yaml` to read from environment variables:
+---
 
-```yaml
-spring:
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${SPRING_MAIL_USERNAME}
-    password: ${SPRING_MAIL_PASSWORD}
+### 2. Configuration Class (`Email-Configuration` branch)
+
+In the `Email-Configuration` branch, email properties and SMTP parameters are loaded programmatically via a Java configuration class (`EmailConfig.java`) and `ApplicationConstants.java`:
+
+- **`ApplicationConstants.java`**: Holds email server parameters (`MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, etc.) and SMTP property keys/values.
+- **`EmailConfig.java`**: Custom `@Configuration` class defining the `JavaMailSender` bean explicitly:
+
+```java
+@Configuration
+public class EmailConfig {
+
+    @Bean
+    public JavaMailSender javaMailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(ApplicationConstants.MAIL_HOST);
+        mailSender.setPort(ApplicationConstants.MAIL_PORT);
+        mailSender.setUsername(ApplicationConstants.MAIL_USERNAME);
+        mailSender.setPassword(ApplicationConstants.MAIL_PASSWORD);
+        mailSender.setProtocol(ApplicationConstants.MAIL_PROTOCOL);
+        mailSender.setDefaultEncoding(ApplicationConstants.MAIL_DEFAULT_ENCODING);
+
+        Properties props = mailSender.getJavaMailProperties();
+        props.put(ApplicationConstants.MAIL_SMTP_AUTH, ApplicationConstants.MAIL_SMTP_AUTH_VALUE);
+        props.put(ApplicationConstants.MAIL_SMTP_STARTTLS_ENABLE, ApplicationConstants.MAIL_SMTP_STARTTLS_ENABLE_VALUE);
+        props.put(ApplicationConstants.MAIL_SMTP_STARTTLS_REQUIRED, ApplicationConstants.MAIL_SMTP_STARTTLS_REQUIRED_VALUE);
+        props.put(ApplicationConstants.MAIL_SMTP_CONNECTIONTIMEOUT, ApplicationConstants.MAIL_SMTP_CONNECTIONTIMEOUT_VALUE);
+        props.put(ApplicationConstants.MAIL_SMTP_TIMEOUT, ApplicationConstants.MAIL_SMTP_TIMEOUT_VALUE);
+        props.put(ApplicationConstants.MAIL_SMTP_WRITETIMEOUT, ApplicationConstants.MAIL_SMTP_WRITETIMEOUT_VALUE);
+
+        return mailSender;
+    }
+}
 ```
-
-Then set environment variables in your terminal or IDE:
-- **Windows PowerShell**:
-  ```powershell
-  $env:SPRING_MAIL_USERNAME="your-email@gmail.com"
-  $env:SPRING_MAIL_PASSWORD="your-16-digit-app-password"
-  ```
-- **Linux/macOS**:
-  ```bash
-  export SPRING_MAIL_USERNAME="your-email@gmail.com"
-  export SPRING_MAIL_PASSWORD="your-16-digit-app-password"
-  ```
 
 ---
 
@@ -127,5 +163,5 @@ Mail sent!
 
 ## 🛡️ Security Best Practices
 - ⚠️ **Never commit your actual Gmail App Password** or personal email to public repositories.
-- Use `.gitignore` to prevent committing configuration files containing secrets.
-- Revoke App Passwords anytime under [Google Account Security](https://myaccount.google.com/apppasswords) if they are compromised.
+- Use placeholder values or environment variables for production credentials in version control.
+- Revoke App Passwords anytime under [Google Account Security](https://myaccount.google.com/apppasswords) if compromised.
