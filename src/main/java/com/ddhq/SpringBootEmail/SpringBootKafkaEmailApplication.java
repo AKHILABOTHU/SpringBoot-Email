@@ -1,4 +1,4 @@
-package com.ddhq.SpringBootKafkaEmail;
+package com.ddhq.SpringBootEmail;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,6 +1,7 @@
-package com.ddhq.SpringBootKafkaEmail.controller;
+package com.ddhq.SpringBootEmail.controller;
 
-import com.ddhq.SpringBootKafkaEmail.service.EmailService;
+import com.ddhq.SpringBootEmail.constants.ApplicationConstants;
+import com.ddhq.SpringBootEmail.service.EmailService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,9 +18,8 @@ public class MailController {
     public String sendMail(@RequestParam String to) {
         emailService.sendEmail(
                 to,
-                "Test Mail from Spring Boot",
-                "Hello! This is a test email 🚀"
-        );
+                ApplicationConstants.DEFAULT_EMAIL_SUBJECT,
+                ApplicationConstants.DEFAULT_EMAIL_BODY);
         return "Mail sent!";
     }
 }

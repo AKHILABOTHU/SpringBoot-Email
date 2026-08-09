@@ -1,20 +1,3 @@
 spring:
   application:
     name: SpringBootEmail
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: [EMAIL_ADDRESS]
-    password: [PASSWORD]
-    protocol: smtp
-    default-encoding: UTF-8
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
