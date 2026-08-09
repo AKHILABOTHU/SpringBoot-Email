@@ -123,6 +123,23 @@ curl "http://localhost:8080/mail/send?to=recipient@example.com"
 Mail sent!
 ```
 
+### Send Email with Attachment
+
+Send an email with a file attachment via multipart form submission (`POST`):
+
+```bash
+curl -X POST "http://localhost:8080/mail/send-with-attachment" \
+  -F "to=recipient@example.com" \
+  -F "subject=Test Mail with Attachment" \
+  -F "body=Please find the attached file." \
+  -F "file=@/path/to/sample.pdf"
+```
+
+**Expected Response:**
+```text
+Mail with attachment sent successfully!
+```
+
 ---
 
 ## 🛡️ Security Best Practices
