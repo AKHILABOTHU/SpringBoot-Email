@@ -7,6 +7,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/mail")
 public class MailController {
@@ -39,6 +42,27 @@ public class MailController {
             return "Mail with attachment sent successfully!";
         } catch (MessagingException e) {
             return "Failed to send mail with attachment: " + e.getMessage();
+        }
+    }
+
+    @PostMapping("/send-template")
+    public String sendTemplateMail(
+            @RequestParam("to") String to,
+            @RequestParam(value = "name", required = false, defaultValue = "Valued User") String name,
+            @RequestParam(value = "headerTitle", required = false, defaultValue = "SpringBoot Notification") String headerTitle,
+            @RequestParam(value = "message", required = false, defaultValue = "Welcome! This is an HTML template email rendered using Apache FreeMarker.") String message,
+            @RequestParam(value = "details", required = false, defaultValue = "Your account updates and preferences have been processed.") String details) {
+        try {
+            Map<String, Object> model = new HashMap<>();
+            model.put("name", name);
+            model.put("headerTitle", headerTitle);
+            model.put("message", message);
+            model.put("details", details);
+
+            emailService.sendHtmlEmailWithTemplate(to, "FreeMarker Template Email Notification", model, "email-template.ftl");
+            return "HTML Email with FreeMarker template sent successfully!";
+        } catch (Exception e) {
+            return "Failed to send HTML template email: " + e.getMessage();
         }
     }
 }

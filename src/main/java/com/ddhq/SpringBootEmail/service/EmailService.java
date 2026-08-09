@@ -1,21 +1,30 @@
 package com.ddhq.SpringBootEmail.service;
 
 import com.ddhq.SpringBootEmail.constants.ApplicationConstants;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
 
 @Service
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    private final Configuration freemarkerConfig;
 
-    public EmailService(JavaMailSender mailSender) {
+    public EmailService(JavaMailSender mailSender, Configuration freemarkerConfig) {
         this.mailSender = mailSender;
+        this.freemarkerConfig = freemarkerConfig;
     }
 
     public void sendEmail(String to, String subject, String body) {
@@ -42,6 +51,23 @@ public class EmailService {
             String filename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "attachment";
             helper.addAttachment(filename, file);
         }
+
+        mailSender.send(mimeMessage);
+    }
+
+    public void sendHtmlEmailWithTemplate(String to, String subject, Map<String, Object> model, String templateName) 
+            throws MessagingException, IOException, TemplateException {
+        
+        Template template = freemarkerConfig.getTemplate(templateName);
+        String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+        helper.setFrom(ApplicationConstants.DEFAULT_SENDER_EMAIL);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(htmlContent, true);
 
         mailSender.send(mimeMessage);
     }

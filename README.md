@@ -140,6 +140,24 @@ curl -X POST "http://localhost:8080/mail/send-with-attachment" \
 Mail with attachment sent successfully!
 ```
 
+### Send FreeMarker HTML Template Email
+
+Send a responsive HTML email rendered with Apache FreeMarker templates (`header.ftl`, `footer.ftl`, `email-template.ftl`):
+
+```bash
+curl -X POST "http://localhost:8080/mail/send-template" \
+  -d "to=recipient@example.com" \
+  -d "name=John Doe" \
+  -d "headerTitle=Welcome Notification" \
+  -d "message=Thank you for joining our platform!" \
+  -d "details=Your account setup is now complete."
+```
+
+**Expected Response:**
+```text
+HTML Email with FreeMarker template sent successfully!
+```
+
 ---
 
 ## 🛡️ Security Best Practices
