@@ -1,4 +1,4 @@
-package com.ddhq.SpringBootKafkaEmail.service;
+package com.ddhq.SpringBootEmail.service;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,7 +16,7 @@ public class EmailService {
     public void sendEmail(String to, String subject, String body) {
 
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("abothuakhil@gmail.com");
+        message.setFrom("[To_Email]");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(body);
